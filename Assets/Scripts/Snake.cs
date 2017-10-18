@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Snake : MonoBehaviour {
 
     private Snake next;
+    static public Action<String> hit;
 
     public void Setnext(Snake IN)
     {
@@ -19,5 +21,17 @@ public class Snake : MonoBehaviour {
     public void RemoveTail()
     {
         Destroy(this.gameObject);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (hit != null)
+        {
+            hit(other.tag);
+        }
+        if(other.tag == "Food")
+        {
+            Destroy(other.gameObject);
+        }
     }
 }

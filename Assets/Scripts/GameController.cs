@@ -4,15 +4,33 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
+    public int maxSize;
+    public int currentSize;
+    public int xBound;
+    public int yBound;
+    public int score;
+    public GameObject foodPref;
+    public GameObject currentFood;
     public GameObject snakePref;
     public Snake head;
     public Snake tail;
     public int direction;
     public Vector2 nextPos;
 
+    private void OnEnable()
+    {
+        Snake.hit += hit;
+    }
+
     void Start()
     {
         InvokeRepeating("TimerInvoke", 0, 0.5f);
+        FoodFunction();
+    }
+
+    private void OnDisable()
+    {
+        Snake.hit -= hit;
     }
 
 
@@ -25,6 +43,14 @@ public class GameController : MonoBehaviour {
     void TimerInvoke()
     {
         Movement();
+        if (currentSize >= maxSize)
+        {
+            TailFunction();
+        }
+        else
+        {
+            currentSize++;
+        }
     }
 
     void Movement()
@@ -73,6 +99,45 @@ public class GameController : MonoBehaviour {
         if (direction != 1 && Input.GetButtonDown("Left"))
         {
             direction = 3;
+        }
+    }
+
+    void TailFunction()
+    {
+        Snake tempSnake = tail;
+        tail = tail.GetNext();
+        tempSnake.RemoveTail();
+    }
+
+    void FoodFunction()
+    {
+        int xPos = Random.Range(-xBound, xBound);
+        int yPos = Random.Range(-yBound, yBound);
+
+        currentFood = (GameObject)Instantiate(foodPref, new Vector2(xPos, yPos), transform.rotation);
+        StartCoroutine(CheckRender(currentFood));
+    }
+
+    IEnumerator CheckRender(GameObject IN)
+    {
+        yield return new WaitForEndOfFrame();
+        if (IN.GetComponent<Renderer>().isVisible == false)
+        {
+            if(IN.tag == "Food")
+            {
+                Destroy(IN);
+                FoodFunction();
+            }
+        }
+    }
+
+    void hit(string WhatWasSent)
+    {
+        if(WhatWasSent == "Food")
+        {
+            FoodFunction();
+            maxSize++;
+            score++;
         }
     }
 }
