@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
 
@@ -16,6 +18,7 @@ public class GameController : MonoBehaviour {
     public Snake tail;
     public int direction;
     public Vector2 nextPos;
+    public Text scoreText;
 
     private void OnEnable()
     {
@@ -133,11 +136,28 @@ public class GameController : MonoBehaviour {
 
     void hit(string WhatWasSent)
     {
-        if(WhatWasSent == "Food")
+        if (WhatWasSent == "Snake")
+        {
+            CancelInvoke("TimerInvoke");
+            Exit();
+        }
+
+        if (WhatWasSent == "Food")
         {
             FoodFunction();
             maxSize++;
             score++;
+            scoreText.text = score.ToString();
+            int temp = PlayerPrefs.GetInt("HighScore");
+            if (score > temp)
+            {
+                PlayerPrefs.SetInt("HighScore", score);
+            }
         }
+    }
+
+    public void Exit()
+    {
+        SceneManager.LoadScene(0);
     }
 }
